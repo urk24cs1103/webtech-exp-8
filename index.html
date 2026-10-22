@@ -7,9 +7,7 @@
   <!-- React & ReactDOM CDN -->
   <script src="https://unpkg.com/react@18/umd/react.production.min.js" crossorigin></script>
   <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js" crossorigin></script>
-  <!-- React Router DOM CDN -->
-  <script src="https://unpkg.com/react-router-dom@6/umd/react-router-dom.production.min.js"></script>
-  <!-- Babel Standalone to compile React JSX in browser -->
+  <!-- Babel Standalone to parse JSX in browser -->
   <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
   
   <style>
@@ -36,10 +34,18 @@
       justify-content: center;
       gap: 24px;
     }
-    nav a {
+    nav button {
+      background: none;
+      border: none;
       color: white;
-      text-decoration: none;
       font-weight: bold;
+      font-size: 16px;
+      cursor: pointer;
+      padding: 6px 12px;
+      border-radius: 4px;
+    }
+    nav button:hover, nav button.active {
+      background: rgba(255, 255, 255, 0.2);
     }
     main {
       padding: 24px 16px;
@@ -80,8 +86,8 @@
       color: #dc2626;
       margin-top: 5px;
     }
-    button,
-    .button {
+    button.submit-btn,
+    .button-link {
       display: inline-block;
       margin-top: 20px;
       padding: 12px 18px;
@@ -92,11 +98,12 @@
       text-decoration: none;
       cursor: pointer;
       font-size: 15px;
+      text-align: center;
     }
-    button {
+    button.submit-btn {
       width: 100%;
     }
-    button:disabled {
+    button.submit-btn:disabled {
       background: #94a3b8;
       cursor: not-allowed;
     }
@@ -120,18 +127,17 @@
 
   <script type="text/babel">
     const { useState } = React;
-    const { HashRouter, Routes, Route, Link } = ReactRouterDOM;
 
-    function Home() {
+    function Home({ setPage }) {
       return (
         <div className="card">
           <h2>Welcome to Finance & Investment Blog</h2>
           <p>
             Learn smart investing strategies, track stock market trends, and build long-term wealth.
           </p>
-          <Link className="button" to="/register">
+          <button className="button-link" onClick={() => setPage('register')}>
             Register Now
-          </Link>
+          </button>
         </div>
       );
     }
@@ -267,7 +273,7 @@
               <option value="Female">Female</option>
               <option value="Other">Other</option>
             </select>
-            {form.gender === "" && <small>Gender is required.</small>}
+            {form.gender === ""}
 
             <label>State</label>
             <select
@@ -282,9 +288,9 @@
               <option value="Karnataka">Karnataka</option>
               <option value="Andhra Pradesh">Andhra Pradesh</option>
             </select>
-            {form.state === "" && <small>State is required.</small>}
+            {form.state === ""}
 
-            <button type="submit" disabled={!valid}>
+            <button type="submit" className="submit-btn" disabled={!valid}>
               Submit Registration
             </button>
             {submitted && (
@@ -298,22 +304,31 @@
     }
 
     function App() {
+      const [page, setPage] = useState('home');
+
       return (
-        <HashRouter>
+        <div>
           <header>
             <h1>Finance & Investment Blog</h1>
             <nav>
-              <Link to="/">Home</Link>
-              <Link to="/register">Registration</Link>
+              <button 
+                className={page === 'home' ? 'active' : ''} 
+                onClick={() => setPage('home')}
+              >
+                Home
+              </button>
+              <button 
+                className={page === 'register' ? 'active' : ''} 
+                onClick={() => setPage('register')}
+              >
+                Registration
+              </button>
             </nav>
           </header>
           <main>
-            <Routes>
-              <Route path="/" element={<Home />} />
-              <Route path="/register" element={<Register />} />
-            </Routes>
+            {page === 'home' ? <Home setPage={setPage} /> : <Register />}
           </main>
-        </HashRouter>
+        </div>
       );
     }
 
